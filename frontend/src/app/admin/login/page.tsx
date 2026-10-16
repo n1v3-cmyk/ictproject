@@ -13,9 +13,9 @@ import {
   ArrowRight,
   ArrowLeft,
   KeyRound,
-  CheckCircle2,
 } from 'lucide-react';
 import { useFeedback } from '@/context/FeedbackContext';
+import { DEMO_CREDENTIALS } from '@/api';
 import { Card, CardContent } from '@/components/ui/Card';
 
 export default function AdminLoginPage() {
@@ -29,12 +29,12 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const fillDemoCredentials = () => {
-    setEmail('admin@civicconnect.gov.in');
-    setPassword('DemoAdmin@2026');
+    setEmail(DEMO_CREDENTIALS.email);
+    setPassword(DEMO_CREDENTIALS.password);
     setError(null);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -44,23 +44,26 @@ export default function AdminLoginPage() {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      const success = loginAdmin(password);
+    try {
+      const success = await loginAdmin(email, password);
       if (success) {
         router.push('/admin/dashboard');
       } else {
-        setError('Invalid credentials. For the prototype, use password "DemoAdmin@2026" or click "Fill Demo Credentials".');
+        setError('Invalid credentials. Use the demo credentials shown below to sign in.');
         setIsLoading(false);
       }
-    }, 400);
+    } catch {
+      setError('Unable to sign in right now. Please try again.');
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 py-12 bg-gradient-to-b from-[#F2F7F4]/50 via-[#FBFBF9] to-[#FBFBF9]">
+    <div className="min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 py-12 bg-gradient-to-b from-sage-50/50 via-canvas to-canvas">
       <div className="w-full max-w-md space-y-6">
         {/* Header Branding */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-[#46664F] text-white flex items-center justify-center mx-auto shadow-md">
+          <div className="w-12 h-12 rounded-2xl bg-sage-600 text-white flex items-center justify-center mx-auto shadow-md">
             <ShieldCheck className="w-7 h-7" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-stone-900">
@@ -72,12 +75,14 @@ export default function AdminLoginPage() {
         </div>
 
         {/* Prototype Warning Banner */}
-        <div className="p-3.5 rounded-xl bg-[#FEF8EB] border border-[#FDE68A] text-xs text-[#92400E] flex items-start gap-2.5">
-          <AlertCircle className="w-4 h-4 text-[#B45309] shrink-0 mt-0.5" />
+        <div className="p-3.5 rounded-xl bg-warn-surface border border-warn-border text-xs text-warn-ink-strong flex items-start gap-2.5">
+          <AlertCircle className="w-4 h-4 text-warn-ink shrink-0 mt-0.5" />
           <div>
             <p className="font-semibold">Demonstration Mode Notice</p>
-            <p className="text-[11px] text-[#B45309] mt-0.5 leading-relaxed">
-              This is a prototype authentication interface. Browser local state simulates an authorized state nodal officer session. Do not enter confidential passwords.
+            <p className="text-[11px] text-warn-ink mt-0.5 leading-relaxed">
+              This is a demonstration interface. Signing in issues a mock session token so the admin
+              portal is usable before the backend exists; in production, authorization is enforced
+              server-side. Do not enter confidential passwords.
             </p>
           </div>
         </div>
@@ -98,7 +103,7 @@ export default function AdminLoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="nodal.officer@kerala.gov.in"
-                    className="w-full rounded-xl border border-stone-300 pl-9 pr-3.5 py-2.5 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#46664F] focus:border-transparent bg-white"
+                    className="w-full rounded-xl border border-stone-300 pl-9 pr-3.5 py-2.5 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-sage-600 focus:border-transparent bg-white"
                   />
                 </div>
               </div>
@@ -109,7 +114,7 @@ export default function AdminLoginPage() {
                   <label className="block text-xs font-semibold text-stone-700">
                     Access Passphrase
                   </label>
-                  <span className="text-[10px] text-stone-400">Demo: DemoAdmin@2026</span>
+                  <span className="text-[10px] text-stone-400">{`Demo: ${DEMO_CREDENTIALS.password}`}</span>
                 </div>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
@@ -118,7 +123,7 @@ export default function AdminLoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full rounded-xl border border-stone-300 pl-9 pr-10 py-2.5 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#46664F] focus:border-transparent bg-white"
+                    className="w-full rounded-xl border border-stone-300 pl-9 pr-10 py-2.5 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-sage-600 focus:border-transparent bg-white"
                   />
                   <button
                     type="button"
@@ -142,7 +147,7 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-[#46664F] text-white hover:bg-[#38523F] transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-sage-600 text-white hover:bg-sage-700 transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
               >
                 {isLoading ? (
                   <span>Authenticating...</span>
@@ -160,9 +165,9 @@ export default function AdminLoginPage() {
               <button
                 type="button"
                 onClick={fillDemoCredentials}
-                className="w-full py-2 px-3 rounded-lg border border-dashed border-[#CADACF] bg-[#F2F7F4] hover:bg-[#E2EDE5] text-[#2C4032] text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full py-2 px-3 rounded-lg border border-dashed border-sage-200 bg-sage-50 hover:bg-sage-150 text-ink-strong text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
-                <KeyRound className="w-3.5 h-3.5 text-[#46664F]" />
+                <KeyRound className="w-3.5 h-3.5 text-sage-600" />
                 <span>Fill 1-Click Demo Credentials</span>
               </button>
             </div>

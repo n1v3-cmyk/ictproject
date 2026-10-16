@@ -6,10 +6,6 @@ import {
   MapPin,
   AlertTriangle,
   Info,
-  Layers,
-  Sparkles,
-  ShieldAlert,
-  CheckCircle2,
   SlidersHorizontal,
 } from 'lucide-react';
 import { useFeedback } from '@/context/FeedbackContext';
@@ -21,14 +17,14 @@ const GeographicMap = dynamic(() => import('@/components/admin/GeographicMap'), 
   ssr: false,
   loading: () => (
     <div className="w-full h-[520px] bg-stone-100 rounded-2xl flex flex-col items-center justify-center text-stone-500 gap-3 border border-stone-200">
-      <div className="w-8 h-8 border-3 border-[#46664F] border-t-transparent rounded-full animate-spin" />
+      <div className="w-8 h-8 border-3 border-sage-600 border-t-transparent rounded-full animate-spin" />
       <span className="text-xs font-medium">Initializing Kerala Geographic Cartography...</span>
     </div>
   ),
 });
 
 export default function GeographicAnalysisPage() {
-  const { filteredFeedbacks, feedbacks, filters, setFilter } = useFeedback();
+  const { filteredFeedbacks, filters, setFilter } = useFeedback();
 
   // Calculate problem hotspots vs high satisfaction clusters
   const districtCounts: Record<string, { total: number; negative: number; positive: number }> = {};
@@ -41,7 +37,7 @@ export default function GeographicAnalysisPage() {
   });
 
   const highIssueDistricts = Object.entries(districtCounts)
-    .filter(([_, data]) => data.negative >= 2)
+    .filter(([, data]) => data.negative >= 2)
     .sort((a, b) => b[1].negative - a[1].negative);
 
   return (
@@ -50,8 +46,8 @@ export default function GeographicAnalysisPage() {
       <FilterBar />
 
       {/* Demonstration Notice Alert */}
-      <div className="p-4 rounded-2xl bg-[#FEF8EB] border border-[#FDE68A] flex items-start gap-3 text-xs text-[#92400E]">
-        <Info className="w-5 h-5 text-[#B45309] shrink-0 mt-0.5" />
+      <div className="p-4 rounded-2xl bg-warn-surface border border-warn-border flex items-start gap-3 text-xs text-warn-ink-strong">
+        <Info className="w-5 h-5 text-warn-ink shrink-0 mt-0.5" />
         <div className="space-y-1">
           <p className="font-semibold">Demonstration Geospatial Visualization Notice</p>
           <p className="leading-relaxed">
@@ -66,7 +62,7 @@ export default function GeographicAnalysisPage() {
         <Card className="lg:col-span-8 overflow-hidden flex flex-col">
           <CardHeader className="py-4 px-6 flex items-center justify-between border-b border-stone-100 bg-white">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-[#EBF2ED] text-[#46664F] flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-sage-100 text-sage-600 flex items-center justify-center">
                 <MapPin className="w-4 h-4" />
               </div>
               <div>
@@ -92,19 +88,19 @@ export default function GeographicAnalysisPage() {
           </CardContent>
 
           {/* Map Legend Footer */}
-          <div className="p-4 bg-[#FBFBF9] border-t border-stone-200/80 flex flex-wrap items-center justify-between gap-4 text-xs text-stone-600">
+          <div className="p-4 bg-canvas border-t border-stone-200/80 flex flex-wrap items-center justify-between gap-4 text-xs text-stone-600">
             <div className="flex items-center gap-6">
               <span className="font-semibold text-stone-700">Map Legend:</span>
               <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-full bg-[#EF4444] border-2 border-white shadow-2xs" />
+                <span className="w-3 h-3 rounded-full bg-neg border-2 border-white shadow-2xs" />
                 <span>Frequent Issues (Rating &lt; 2.8)</span>
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-full bg-[#F59E0B] border-2 border-white shadow-2xs" />
+                <span className="w-3 h-3 rounded-full bg-warn border-2 border-white shadow-2xs" />
                 <span>Mixed / Moderate (2.8 - 3.7)</span>
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-full bg-[#22C55E] border-2 border-white shadow-2xs" />
+                <span className="w-3 h-3 rounded-full bg-pos border-2 border-white shadow-2xs" />
                 <span>High Satisfaction (≥ 3.8)</span>
               </span>
             </div>
@@ -137,7 +133,7 @@ export default function GeographicAnalysisPage() {
                     <div
                       key={districtName}
                       onClick={() => setFilter('district', districtName)}
-                      className="p-3.5 rounded-xl border border-stone-200 bg-white hover:border-[#CADACF] hover:bg-stone-50 transition-all cursor-pointer space-y-2"
+                      className="p-3.5 rounded-xl border border-stone-200 bg-white hover:border-sage-200 hover:bg-stone-50 transition-all cursor-pointer space-y-2"
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-semibold text-xs text-stone-900">
@@ -169,7 +165,7 @@ export default function GeographicAnalysisPage() {
           {/* District Quick Zoom Selector */}
           <Card>
             <CardHeader className="py-4 px-5 flex items-center gap-2">
-              <SlidersHorizontal className="w-4 h-4 text-[#46664F]" />
+              <SlidersHorizontal className="w-4 h-4 text-sage-600" />
               <h3 className="text-sm font-semibold text-stone-900">
                 District Focus Navigator
               </h3>
@@ -186,7 +182,7 @@ export default function GeographicAnalysisPage() {
                     onClick={() => setFilter('district', d)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                       filters.district === d
-                        ? 'bg-[#46664F] text-white'
+                        ? 'bg-sage-600 text-white'
                         : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
                     }`}
                   >

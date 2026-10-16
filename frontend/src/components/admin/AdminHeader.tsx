@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Menu, ShieldCheck, UserCheck, ArrowLeft, Filter, Sparkles } from 'lucide-react';
+import { Menu, ArrowLeft, Filter } from 'lucide-react';
 import { useFeedback } from '@/context/FeedbackContext';
 
 interface AdminHeaderProps {
@@ -25,7 +25,7 @@ export function AdminHeader({ onOpenMobileMenu, title = 'Administrative Intellig
   ].filter(Boolean).length;
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-[#E5E9E6] h-16 flex items-center px-4 sm:px-6 lg:px-8 justify-between">
+    <header className="sticky top-0 z-30 bg-white border-b border-line h-16 flex items-center px-4 sm:px-6 lg:px-8 justify-between">
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -48,8 +48,8 @@ export function AdminHeader({ onOpenMobileMenu, title = 'Administrative Intellig
 
       <div className="flex items-center gap-3">
         {/* Active Filter Indicator Pill */}
-        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F2F7F4] border border-[#CADACF] text-xs text-[#2C4032]">
-          <Filter className="w-3.5 h-3.5 text-[#46664F]" />
+        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-sage-50 border border-sage-200 text-xs text-ink-strong">
+          <Filter className="w-3.5 h-3.5 text-sage-600" />
           <span>
             {activeFiltersCount > 0
               ? `${activeFiltersCount} Filter${activeFiltersCount > 1 ? 's' : ''} Active`
@@ -62,7 +62,7 @@ export function AdminHeader({ onOpenMobileMenu, title = 'Administrative Intellig
 
         {/* Nodal Officer Badge */}
         <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-stone-200">
-          <div className="w-8 h-8 rounded-full bg-[#EBF2ED] text-[#46664F] flex items-center justify-center font-bold text-xs border border-[#CADACF]">
+          <div className="w-8 h-8 rounded-full bg-sage-100 text-sage-600 flex items-center justify-center font-bold text-xs border border-sage-200">
             DA
           </div>
           <div className="hidden md:block text-left">

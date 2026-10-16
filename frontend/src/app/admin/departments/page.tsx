@@ -6,20 +6,16 @@ import {
   Plus,
   Edit2,
   Trash2,
-  CheckCircle2,
   AlertCircle,
-  FileCheck2,
   Mail,
   User,
-  RotateCcw,
-  Layers,
   ChevronDown,
   ChevronRight,
 } from 'lucide-react';
 import { useFeedback } from '@/context/FeedbackContext';
-import { Card, CardContent, CardHeader } from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
-import { Department, GovernmentService } from '@/types/feedback';
+import { Department } from '@/types/feedback';
 
 export default function DepartmentManagementPage() {
   const {
@@ -29,7 +25,6 @@ export default function DepartmentManagementPage() {
     deleteDepartment,
     addServiceToDepartment,
     deleteServiceFromDepartment,
-    resetToDefaultData,
   } = useFeedback();
 
   // State for expanded departments in UI
@@ -128,9 +123,9 @@ export default function DepartmentManagementPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="bg-white rounded-2xl border border-[#E5E9E6] p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl border border-line p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-semibold text-[#46664F] uppercase tracking-wider block mb-1">
+          <span className="text-xs font-semibold text-sage-600 uppercase tracking-wider block mb-1">
             Department & Hierarchy Configuration
           </span>
           <h2 className="text-xl font-bold text-stone-900">
@@ -153,7 +148,7 @@ export default function DepartmentManagementPage() {
               setDeptFormError(null);
               setIsAddDeptModalOpen(true);
             }}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-[#46664F] text-white hover:bg-[#38523F] transition-colors shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-sage-600 text-white hover:bg-sage-700 transition-colors shadow-xs cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add Department</span>
@@ -162,8 +157,8 @@ export default function DepartmentManagementPage() {
       </div>
 
       {/* Prototype Notice Alert */}
-      <div className="p-4 rounded-xl bg-[#FEF8EB] border border-[#FDE68A] text-xs text-[#92400E] flex items-start gap-3">
-        <AlertCircle className="w-4 h-4 text-[#B45309] shrink-0 mt-0.5" />
+      <div className="p-4 rounded-xl bg-warn-surface border border-warn-border text-xs text-warn-ink-strong flex items-start gap-3">
+        <AlertCircle className="w-4 h-4 text-warn-ink shrink-0 mt-0.5" />
         <div className="space-y-1">
           <p className="font-semibold">Demo State Notice</p>
           <p className="leading-relaxed">
@@ -184,7 +179,7 @@ export default function DepartmentManagementPage() {
                 onClick={() => setExpandedDeptId(isExpanded ? null : dept.id)}
               >
                 <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-[#EBF2ED] text-[#46664F] flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-sage-100 text-sage-600 flex items-center justify-center shrink-0">
                     <Building2 className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
@@ -230,15 +225,15 @@ export default function DepartmentManagementPage() {
 
               {/* Expanded Services Drawer */}
               {isExpanded && (
-                <div className="bg-[#FAF5F5]/30 border-t border-stone-100 p-5 space-y-4 animate-in fade-in duration-150">
+                <div className="bg-blush-50/30 border-t border-stone-100 p-5 space-y-4 animate-in fade-in duration-150">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                     <div className="flex items-center gap-4 text-stone-600">
                       <span className="flex items-center gap-1.5">
-                        <User className="w-3.5 h-3.5 text-[#46664F]" />
+                        <User className="w-3.5 h-3.5 text-sage-600" />
                         <strong>Nodal:</strong> {dept.nodalOfficer}
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <Mail className="w-3.5 h-3.5 text-[#46664F]" />
+                        <Mail className="w-3.5 h-3.5 text-sage-600" />
                         {dept.contactEmail}
                       </span>
                     </div>
@@ -253,7 +248,7 @@ export default function DepartmentManagementPage() {
                         setServiceCategory('');
                         setServiceFormError(null);
                       }}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#38523F] bg-[#EBF2ED] hover:bg-[#DCE9E0] transition-colors self-start sm:self-auto"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-sage-700 bg-sage-100 hover:bg-sage-300 transition-colors self-start sm:self-auto"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Add Service to {dept.code}</span>
@@ -415,7 +410,7 @@ export default function DepartmentManagementPage() {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl bg-[#46664F] text-white font-semibold hover:bg-[#38523F]"
+                className="px-4 py-2 rounded-xl bg-sage-600 text-white font-semibold hover:bg-sage-700"
               >
                 {editingDept ? 'Save Changes' : 'Create Department'}
               </button>
@@ -504,7 +499,7 @@ export default function DepartmentManagementPage() {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl bg-[#46664F] text-white font-semibold hover:bg-[#38523F]"
+                className="px-4 py-2 rounded-xl bg-sage-600 text-white font-semibold hover:bg-sage-700"
               >
                 Add Service
               </button>

@@ -61,17 +61,17 @@ export function AdminSidebar({ onCloseMobile }: AdminSidebarProps) {
   ];
 
   return (
-    <aside className="w-64 bg-[#1F2421] text-stone-300 flex flex-col shrink-0 h-full border-r border-stone-800">
+    <aside className="w-64 bg-ink text-stone-300 flex flex-col shrink-0 h-full border-r border-stone-800">
       {/* Brand Header */}
       <div className="p-5 border-b border-stone-800/80 flex items-center justify-between">
         <Link href="/admin/dashboard" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-[#46664F] text-white flex items-center justify-center font-bold">
+          <div className="w-9 h-9 rounded-xl bg-sage-600 text-white flex items-center justify-center font-bold">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-semibold text-white tracking-tight text-sm">CivicConnect</span>
-              <span className="text-[9px] uppercase tracking-wider bg-[#38523F] text-[#CADACF] px-1.5 py-0.2 rounded font-bold">
+              <span className="text-[9px] uppercase tracking-wider bg-sage-700 text-sage-200 px-1.5 py-0.2 rounded font-bold">
                 Admin
               </span>
             </div>
@@ -97,7 +97,7 @@ export function AdminSidebar({ onCloseMobile }: AdminSidebarProps) {
               onClick={onCloseMobile}
               className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all group ${
                 isActive
-                  ? 'bg-[#46664F] text-white shadow-xs'
+                  ? 'bg-sage-600 text-white shadow-xs'
                   : 'text-stone-300 hover:text-white hover:bg-stone-800/60'
               }`}
             >
@@ -108,7 +108,7 @@ export function AdminSidebar({ onCloseMobile }: AdminSidebarProps) {
 
               {item.badge !== undefined && (
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
-                  isActive ? 'bg-[#38523F] text-white' : 'bg-stone-800 text-stone-400'
+                  isActive ? 'bg-sage-700 text-white' : 'bg-stone-800 text-stone-400'
                 }`}>
                   {item.badge}
                 </span>
@@ -123,7 +123,7 @@ export function AdminSidebar({ onCloseMobile }: AdminSidebarProps) {
         <div className="p-2.5 rounded-xl bg-stone-900/60 border border-stone-800 text-[11px] space-y-2">
           <div className="flex items-center justify-between text-stone-400">
             <span className="flex items-center gap-1.5">
-              <Database className="w-3.5 h-3.5 text-[#557A60]" />
+              <Database className="w-3.5 h-3.5 text-sage-650" />
               Demo State
             </span>
             <span className="text-[10px] text-stone-400 font-mono">Local</span>

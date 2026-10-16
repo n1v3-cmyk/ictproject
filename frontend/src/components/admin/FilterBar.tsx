@@ -27,11 +27,11 @@ export function FilterBar({ showSearch = true, className = '' }: FilterBarProps)
     Boolean(filters.searchQuery.trim());
 
   return (
-    <div className={`bg-white rounded-2xl border border-[#E5E9E6] p-4 sm:p-5 shadow-xs space-y-3.5 ${className}`}>
+    <div className={`bg-white rounded-2xl border border-line p-4 sm:p-5 shadow-xs space-y-3.5 ${className}`}>
       {/* Top Filter Bar Controls */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#EBF2ED] text-[#46664F] flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-sage-100 text-sage-600 flex items-center justify-center">
             <Filter className="w-4 h-4" />
           </div>
           <span className="text-xs font-semibold text-stone-900 uppercase tracking-wider">
@@ -65,7 +65,7 @@ export function FilterBar({ showSearch = true, className = '' }: FilterBarProps)
             id="filter-district"
             value={filters.district}
             onChange={(e) => setFilter('district', e.target.value)}
-            className="w-full rounded-xl border border-stone-200 px-2.5 py-2 text-stone-800 bg-white focus:outline-none focus:ring-1 focus:ring-[#46664F]"
+            className="w-full rounded-xl border border-stone-200 px-2.5 py-2 text-stone-800 bg-white focus:outline-none focus:ring-1 focus:ring-sage-600"
           >
             <option value="all">All 14 Districts</option>
             {Object.keys(KERALA_DISTRICTS).map((d) => (
@@ -85,7 +85,7 @@ export function FilterBar({ showSearch = true, className = '' }: FilterBarProps)
             id="filter-department"
             value={filters.departmentId}
             onChange={(e) => setFilter('departmentId', e.target.value)}
-            className="w-full rounded-xl border border-stone-200 px-2.5 py-2 text-stone-800 bg-white focus:outline-none focus:ring-1 focus:ring-[#46664F]"
+            className="w-full rounded-xl border border-stone-200 px-2.5 py-2 text-stone-800 bg-white focus:outline-none focus:ring-1 focus:ring-sage-600"
           >
             <option value="all">All Departments</option>
             {departments.map((d) => (
@@ -106,7 +106,7 @@ export function FilterBar({ showSearch = true, className = '' }: FilterBarProps)
             disabled={filters.departmentId === 'all'}
             value={filters.serviceId}
             onChange={(e) => setFilter('serviceId', e.target.value)}
-            className={`w-full rounded-xl border border-stone-200 px-2.5 py-2 text-stone-800 bg-white focus:outline-none focus:ring-1 focus:ring-[#46664F] ${
+            className={`w-full rounded-xl border border-stone-200 px-2.5 py-2 text-stone-800 bg-white focus:outline-none focus:ring-1 focus:ring-sage-600 ${
               filters.departmentId === 'all' ? 'bg-stone-50 text-stone-400 cursor-not-allowed' : ''
             }`}
           >
@@ -130,7 +130,7 @@ export function FilterBar({ showSearch = true, className = '' }: FilterBarProps)
             id="filter-sentiment"
             value={filters.sentiment}
             onChange={(e) => setFilter('sentiment', e.target.value)}
-            className="w-full rounded-xl border border-stone-200 px-2.5 py-2 text-stone-800 bg-white focus:outline-none focus:ring-1 focus:ring-[#46664F]"
+            className="w-full rounded-xl border border-stone-200 px-2.5 py-2 text-stone-800 bg-white focus:outline-none focus:ring-1 focus:ring-sage-600"
           >
             <option value="all">All Sentiments</option>
             <option value="positive">Positive (Constructive)</option>
@@ -148,7 +148,7 @@ export function FilterBar({ showSearch = true, className = '' }: FilterBarProps)
             id="filter-rating"
             value={filters.rating}
             onChange={(e) => setFilter('rating', e.target.value)}
-            className="w-full rounded-xl border border-stone-200 px-2.5 py-2 text-stone-800 bg-white focus:outline-none focus:ring-1 focus:ring-[#46664F]"
+            className="w-full rounded-xl border border-stone-200 px-2.5 py-2 text-stone-800 bg-white focus:outline-none focus:ring-1 focus:ring-sage-600"
           >
             <option value="all">All Ratings (1 - 5)</option>
             <option value="5">5 Stars (Excellent)</option>
@@ -168,7 +168,7 @@ export function FilterBar({ showSearch = true, className = '' }: FilterBarProps)
             id="filter-date-range"
             value={filters.dateRange}
             onChange={(e) => setFilter('dateRange', e.target.value)}
-            className="w-full rounded-xl border border-stone-200 px-2.5 py-2 text-stone-800 bg-white focus:outline-none focus:ring-1 focus:ring-[#46664F]"
+            className="w-full rounded-xl border border-stone-200 px-2.5 py-2 text-stone-800 bg-white focus:outline-none focus:ring-1 focus:ring-sage-600"
           >
             <option value="all">All Available Records</option>
             <option value="7days">Past 7 Days</option>
@@ -187,7 +187,7 @@ export function FilterBar({ showSearch = true, className = '' }: FilterBarProps)
             placeholder="Search keywords, reference IDs, services, or locations (e.g. 'delay', 'CC-KL-2026-1011', 'license', 'Ernakulam')..."
             value={filters.searchQuery}
             onChange={(e) => setFilter('searchQuery', e.target.value)}
-            className="w-full rounded-xl border border-stone-200 pl-10 pr-9 py-2 text-xs text-stone-900 bg-white placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-[#46664F]"
+            className="w-full rounded-xl border border-stone-200 pl-10 pr-9 py-2 text-xs text-stone-900 bg-white placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-sage-600"
           />
           {filters.searchQuery && (
             <button

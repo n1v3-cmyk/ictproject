@@ -1,9 +1,11 @@
 import React from 'react';
 import { SentimentType } from '@/types/feedback';
 
+export type BadgeVariant = 'default' | 'positive' | 'neutral' | 'negative' | 'sage' | 'outline';
+
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'default' | 'positive' | 'neutral' | 'negative' | 'sage' | 'outline';
+  variant?: BadgeVariant;
   size?: 'sm' | 'md';
   className?: string;
 }
@@ -14,13 +16,13 @@ export function Badge({ children, variant = 'default', size = 'sm', className = 
   let variantClasses = 'bg-stone-100 text-stone-700 border border-stone-200';
 
   if (variant === 'positive') {
-    variantClasses = 'bg-[#EBF7EE] text-[#1E6B35] border border-[#C6E8CD]';
+    variantClasses = 'bg-pos-surface text-pos-ink border border-pos-border';
   } else if (variant === 'neutral') {
-    variantClasses = 'bg-[#FEF8EB] text-[#B45309] border border-[#FDE68A]';
+    variantClasses = 'bg-warn-surface text-warn-ink border border-warn-border';
   } else if (variant === 'negative') {
-    variantClasses = 'bg-[#FDF2F2] text-[#B91C1C] border border-[#FECACA]';
+    variantClasses = 'bg-neg-surface text-neg-ink border border-neg-border';
   } else if (variant === 'sage') {
-    variantClasses = 'bg-[#EDF3EF] text-[#36513D] border border-[#CADACF]';
+    variantClasses = 'bg-sage-400 text-sage-ink border border-sage-200';
   } else if (variant === 'outline') {
     variantClasses = 'bg-transparent text-stone-600 border border-stone-300';
   }
@@ -36,7 +38,7 @@ export function SentimentBadge({ sentiment, score }: { sentiment: SentimentType;
   if (sentiment === 'positive') {
     return (
       <Badge variant="positive">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
+        <span className="w-1.5 h-1.5 rounded-full bg-pos" />
         Positive {score !== undefined ? `(${score}%)` : ''}
       </Badge>
     );
@@ -44,14 +46,14 @@ export function SentimentBadge({ sentiment, score }: { sentiment: SentimentType;
   if (sentiment === 'negative') {
     return (
       <Badge variant="negative">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444]" />
+        <span className="w-1.5 h-1.5 rounded-full bg-neg" />
         Negative {score !== undefined ? `(${score}%)` : ''}
       </Badge>
     );
   }
   return (
     <Badge variant="neutral">
-      <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
+      <span className="w-1.5 h-1.5 rounded-full bg-warn" />
       Neutral {score !== undefined ? `(${score}%)` : ''}
     </Badge>
   );

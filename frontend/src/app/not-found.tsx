@@ -2,13 +2,13 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ShieldAlert, ArrowLeft, Home, LayoutDashboard } from 'lucide-react';
+import { ShieldAlert, Home, LayoutDashboard } from 'lucide-react';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[#FBFBF9] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-6">
       <div className="max-w-md w-full text-center space-y-6">
-        <div className="w-16 h-16 rounded-2xl bg-[#FAF5F5] border border-[#E8D7D8] text-[#8B4848] flex items-center justify-center mx-auto shadow-xs">
+        <div className="w-16 h-16 rounded-2xl bg-blush-50 border border-blush-200 text-blush-ink flex items-center justify-center mx-auto shadow-xs">
           <ShieldAlert className="w-8 h-8" />
         </div>
 
@@ -27,7 +27,7 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link
             href="/"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-[#46664F] text-white hover:bg-[#38523F] transition-colors shadow-xs"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-sage-600 text-white hover:bg-sage-700 transition-colors shadow-xs"
           >
             <Home className="w-4 h-4" />
             <span>Return to Homepage</span>

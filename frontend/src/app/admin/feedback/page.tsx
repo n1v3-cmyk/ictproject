@@ -2,32 +2,19 @@
 
 import React, { useState, useMemo } from 'react';
 import {
-  Search,
-  Filter,
   Download,
   Eye,
   Trash2,
-  X,
-  MapPin,
-  Calendar,
-  Building2,
-  FileCheck2,
-  Star,
-  User,
-  EyeOff,
   Paperclip,
-  CheckCircle2,
-  AlertCircle,
   FileText,
   ChevronLeft,
   ChevronRight,
-  ExternalLink,
 } from 'lucide-react';
 import { useFeedback } from '@/context/FeedbackContext';
 import { FilterBar } from '@/components/admin/FilterBar';
-import { Card, CardContent, CardHeader } from '@/components/ui/Card';
+import { Card, CardHeader } from '@/components/ui/Card';
 import { StarRating } from '@/components/ui/StarRating';
-import { Badge, SentimentBadge } from '@/components/ui/Badge';
+import { SentimentBadge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { FeedbackRecord } from '@/types/feedback';
 
@@ -42,7 +29,8 @@ export default function FeedbackExplorerPage() {
   const itemsPerPage = 8;
 
   // Sorting
-  const [sortBy, setSortBy] = useState<'newest' | 'rating_high' | 'rating_low'>('newest');
+  type FeedbackSort = 'newest' | 'rating_high' | 'rating_low';
+  const [sortBy, setSortBy] = useState<FeedbackSort>('newest');
 
   // Sorted and Paginated items
   const sortedFeedbacks = useMemo(() => {
@@ -132,7 +120,7 @@ export default function FeedbackExplorerPage() {
             <select
               value={sortBy}
               onChange={(e) => {
-                setSortBy(e.target.value as any);
+                setSortBy(e.target.value as FeedbackSort);
                 setCurrentPage(1);
               }}
               className="text-xs rounded-xl border border-stone-200 px-3 py-1.5 bg-white text-stone-700"
@@ -158,7 +146,7 @@ export default function FeedbackExplorerPage() {
         {/* Responsive Table View */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#FAF5F5]/40 border-y border-stone-200 text-stone-500 font-semibold uppercase tracking-wider">
+            <thead className="bg-blush-50/40 border-y border-stone-200 text-stone-500 font-semibold uppercase tracking-wider">
               <tr>
                 <th className="py-3 px-6">Reference ID</th>
                 <th className="py-3 px-4">Location</th>
@@ -359,25 +347,25 @@ export default function FeedbackExplorerPage() {
                 Dimension Ratings Breakdown
               </span>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <div className="p-2.5 rounded-lg border border-stone-100 bg-[#FBFBF9] text-center">
+                <div className="p-2.5 rounded-lg border border-stone-100 bg-canvas text-center">
                   <span className="text-stone-500 block text-[11px]">Helpfulness</span>
                   <span className="font-bold text-stone-900 text-sm mt-0.5 block">
                     ★ {selectedFeedback.categoryRatings.helpfulness} / 5
                   </span>
                 </div>
-                <div className="p-2.5 rounded-lg border border-stone-100 bg-[#FBFBF9] text-center">
+                <div className="p-2.5 rounded-lg border border-stone-100 bg-canvas text-center">
                   <span className="text-stone-500 block text-[11px]">Communication</span>
                   <span className="font-bold text-stone-900 text-sm mt-0.5 block">
                     ★ {selectedFeedback.categoryRatings.communication} / 5
                   </span>
                 </div>
-                <div className="p-2.5 rounded-lg border border-stone-100 bg-[#FBFBF9] text-center">
+                <div className="p-2.5 rounded-lg border border-stone-100 bg-canvas text-center">
                   <span className="text-stone-500 block text-[11px]">Professionalism</span>
                   <span className="font-bold text-stone-900 text-sm mt-0.5 block">
                     ★ {selectedFeedback.categoryRatings.professionalism} / 5
                   </span>
                 </div>
-                <div className="p-2.5 rounded-lg border border-stone-100 bg-[#FBFBF9] text-center">
+                <div className="p-2.5 rounded-lg border border-stone-100 bg-canvas text-center">
                   <span className="text-stone-500 block text-[11px]">Response Time</span>
                   <span className="font-bold text-stone-900 text-sm mt-0.5 block">
                     ★ {selectedFeedback.categoryRatings.responseTime} / 5
@@ -440,6 +428,7 @@ export default function FeedbackExplorerPage() {
                     >
                       <div className="w-10 h-10 rounded-lg bg-white border border-stone-200 flex items-center justify-center shrink-0">
                         {att.previewUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element -- runtime attachment preview URL; next/image cannot optimise it
                           <img
                             src={att.previewUrl}
                             alt={att.name}

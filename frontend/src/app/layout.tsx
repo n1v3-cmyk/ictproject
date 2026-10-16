@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className="min-h-full flex flex-col bg-[#FBFBF9] text-[#1F2421]">
+      <body className="min-h-full flex flex-col bg-canvas text-ink">
         <FeedbackProvider>
           {children}
         </FeedbackProvider>

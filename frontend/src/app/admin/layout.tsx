@@ -1,18 +1,41 @@
 'use client';
 
-import React, { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminHeader } from '@/components/admin/AdminHeader';
+import { useFeedback } from '@/context/FeedbackContext';
+import { Spinner } from '@/components/ui/States';
 import { X } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isAdminLoggedIn, isLoading } = useFeedback();
+
+  const isLoginPage = pathname === '/admin/login';
+
+  // Client-side route guard. This is a UX convenience only — the authoritative
+  // authorization check lives in the Django backend, which rejects unauthenticated
+  // requests to admin endpoints with 401/403.
+  useEffect(() => {
+    if (!isLoginPage && !isLoading && !isAdminLoggedIn) {
+      router.replace('/admin/login');
+    }
+  }, [isLoginPage, isLoading, isAdminLoggedIn, router]);
 
   // If on admin login page, render clean layout without sidebar
-  if (pathname === '/admin/login') {
-    return <div className="min-h-screen bg-[#FBFBF9]">{children}</div>;
+  if (isLoginPage) {
+    return <div className="min-h-screen bg-canvas">{children}</div>;
+  }
+
+  if (isLoading || !isAdminLoggedIn) {
+    return (
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <Spinner label="Checking administrator session…" />
+      </div>
+    );
   }
 
   const getPageTitle = (path: string) => {
@@ -24,7 +47,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   return (
-    <div className="flex h-screen bg-[#FBFBF9] overflow-hidden">
+    <div className="flex h-screen bg-canvas overflow-hidden">
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex lg:shrink-0 h-full">
         <AdminSidebar />
@@ -37,7 +60,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="relative flex flex-col w-72 max-w-xs bg-[#1F2421] h-full shadow-2xl z-10">
+          <div className="relative flex flex-col w-72 max-w-xs bg-ink h-full shadow-2xl z-10">
             <button
               onClick={() => setMobileMenuOpen(false)}
               className="absolute top-4 right-4 p-1.5 rounded-lg text-stone-400 hover:text-white"

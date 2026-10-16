@@ -1,22 +1,73 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
-:root {
-  --background: #FBFBF9;
-  --foreground: #1F2421;
-  --card-bg: #FFFFFF;
-  --card-border: #E5E9E6;
-  --sage-primary: #46664F;
-  --sage-hover: #38523F;
-  --sage-light: #EBF2ED;
-  --blush-accent: #E8D7D8;
-  --charcoal-muted: #5E6661;
+/* ==========================================================================
+   CivicConnect design tokens (Tailwind v4 `@theme`)
+   One consistent palette: soft sage green primary, warm off-white canvas,
+   dark charcoal ink, muted grey + subtle blush accents, restrained sentiment.
+   ========================================================================== */
+@theme {
+  /* Surfaces */
+  --color-canvas: #fbfbf9;
+  --color-surface: #ffffff;
+  --color-surface-muted: #fafaf8;
+  --color-line: #e5e9e6;
+  --color-line-soft: #f0f2f0;
+
+  /* Ink / text */
+  --color-ink: #1f2421;
+  --color-ink-strong: #2c4032;
+  --color-muted: #5e6661;
+  --color-muted-soft: #6e7571;
+
+  /* Sage — primary */
+  --color-sage-50: #f2f7f4;
+  --color-sage-100: #ebf2ed;
+  --color-sage-150: #e2ede5;
+  --color-sage-200: #cadacf;
+  --color-sage-300: #dce9e0;
+  --color-sage-350: #88a891;
+  --color-sage-400: #edf3ef;
+  --color-sage-500: #5b8266;
+  --color-sage-600: #46664f;
+  --color-sage-650: #557a60;
+  --color-sage-700: #38523f;
+  --color-sage-ink: #36513d;
+
+  /* Blush — subtle accent */
+  --color-blush-50: #faf5f5;
+  --color-blush-200: #e8d7d8;
+  --color-blush-ink: #8b4848;
+
+  /* Sentiment — restrained */
+  --color-pos: #22c55e;
+  --color-pos-surface: #ebf7ee;
+  --color-pos-border: #c6e8cd;
+  --color-pos-ink: #1e6b35;
+
+  --color-warn: #f59e0b;
+  --color-warn-surface: #fef8eb;
+  --color-warn-border: #fde68a;
+  --color-warn-ink: #b45309;
+  --color-warn-ink-strong: #92400e;
+
+  --color-neg: #ef4444;
+  --color-neg-surface: #fdf2f2;
+  --color-neg-border: #fecaca;
+  --color-neg-ink: #b91c1c;
+
+  /* Rating stars */
+  --color-star: #eab308;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -27,14 +78,14 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F5F5F0;
+  background: #f5f5f0;
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD2CE;
+  background: #cbd2ce;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #9FAAA3;
+  background: #9faaa3;
 }
 
 /* Leaflet map fixups */
@@ -49,7 +100,7 @@ body {
 .leaflet-popup-content-wrapper {
   border-radius: 0.75rem;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-  border: 1px solid #E5E9E6;
+  border: 1px solid var(--color-line);
 }
 
 .leaflet-popup-content {

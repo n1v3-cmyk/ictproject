@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShieldCheck, MessageSquarePlus, Info, Menu, X, ArrowRight, LayoutDashboard } from 'lucide-react';
+import { ShieldCheck, MessageSquarePlus, Menu, X, ArrowRight, LayoutDashboard } from 'lucide-react';
 import { useFeedback } from '@/context/FeedbackContext';
 
 export function CitizenNavbar() {
@@ -14,22 +14,23 @@ export function CitizenNavbar() {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Share Feedback', href: '/feedback' },
-    { name: 'About & Privacy', href: '/about' },
+    { name: 'About', href: '/about' },
+    { name: 'Privacy', href: '/privacy' },
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FBFBF9]/90 backdrop-blur-md border-b border-[#E5E9E6]">
+    <header className="sticky top-0 z-40 bg-canvas/90 backdrop-blur-md border-b border-line">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo & Brand */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-[#46664F] text-white flex items-center justify-center shadow-xs group-hover:bg-[#38523F] transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-sage-600 text-white flex items-center justify-center shadow-xs group-hover:bg-sage-700 transition-colors">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-lg text-stone-900 tracking-tight">CivicConnect</span>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[#EBF2ED] text-[#38523F]">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-sage-100 text-sage-700">
                   Kerala
                 </span>
               </div>
@@ -47,7 +48,7 @@ export function CitizenNavbar() {
                   href={link.href}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-[#EBF2ED] text-[#2C4032]'
+                      ? 'bg-sage-100 text-ink-strong'
                       : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/60'
                   }`}
                 >
@@ -61,7 +62,7 @@ export function CitizenNavbar() {
           <div className="hidden md:flex items-center gap-3">
             <Link
               href="/feedback"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-[#46664F] text-white hover:bg-[#38523F] shadow-xs hover:shadow-sm transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-sage-600 text-white hover:bg-sage-700 shadow-xs hover:shadow-sm transition-all"
             >
               <MessageSquarePlus className="w-4 h-4" />
               <span>Share Feedback</span>
@@ -83,7 +84,7 @@ export function CitizenNavbar() {
           <div className="flex md:hidden items-center gap-2">
             <Link
               href="/feedback"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#46664F] text-white"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-sage-600 text-white"
             >
               <MessageSquarePlus className="w-3.5 h-3.5" />
               <span>Feedback</span>
@@ -101,7 +102,7 @@ export function CitizenNavbar() {
 
       {/* Mobile menu dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-stone-200 bg-[#FBFBF9] px-4 pt-2 pb-6 space-y-3">
+        <div className="md:hidden border-b border-stone-200 bg-canvas px-4 pt-2 pb-6 space-y-3">
           <nav className="flex flex-col space-y-1">
             {navLinks.map((link) => (
               <Link
@@ -109,7 +110,7 @@ export function CitizenNavbar() {
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`px-3 py-2 rounded-lg text-base font-medium ${
-                  pathname === link.href ? 'bg-[#EBF2ED] text-[#2C4032]' : 'text-stone-700 hover:bg-stone-100'
+                  pathname === link.href ? 'bg-sage-100 text-ink-strong' : 'text-stone-700 hover:bg-stone-100'
                 }`}
               >
                 {link.name}

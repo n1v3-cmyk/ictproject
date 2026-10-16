@@ -49,7 +49,7 @@ export function StarRating({
               onClick={() => onChange && onChange(starNum)}
               onMouseEnter={() => !readOnly && setHoverVal(starNum)}
               onMouseLeave={() => !readOnly && setHoverVal(null)}
-              className={`transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#46664F] rounded ${
+              className={`transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-sage-600 rounded ${
                 readOnly ? 'cursor-default' : 'cursor-pointer hover:scale-115 active:scale-95'
               }`}
               aria-label={`${starNum} star${starNum > 1 ? 's' : ''}`}
@@ -57,7 +57,7 @@ export function StarRating({
               <Star
                 className={`${starSize} transition-colors ${
                   isFilled
-                    ? 'fill-[#EAB308] text-[#EAB308]'
+                    ? 'fill-star text-star'
                     : 'fill-transparent text-stone-300 stroke-[1.5]'
                 }`}
               />

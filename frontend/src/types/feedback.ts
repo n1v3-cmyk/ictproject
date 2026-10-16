@@ -20,6 +20,8 @@ export interface FeedbackAttachment {
   size: number;
   previewUrl?: string;
   isDemo?: boolean;
+  /** Present only while the citizen is composing feedback (used for real uploads). */
+  file?: File;
 }
 
 export interface FeedbackRecord {
@@ -58,6 +60,8 @@ export interface GovernmentService {
   description: string;
   averageResolutionDays?: number;
   category: string;
+  /** Defaults to true when omitted (seed data omits it). */
+  isActive?: boolean;
 }
 
 export interface Department {
@@ -69,6 +73,8 @@ export interface Department {
   services: GovernmentService[];
   contactEmail: string;
   nodalOfficer: string;
+  /** Defaults to true when omitted (seed data omits it). */
+  isActive?: boolean;
 }
 
 export interface DistrictInfo {
@@ -79,6 +85,7 @@ export interface DistrictInfo {
 
 export interface FilterState {
   district: string;
+  localArea: string; // 'all' or an exact local-area/taluk name
   departmentId: string;
   serviceId: string;
   sentiment: string; // 'all' | 'positive' | 'neutral' | 'negative'
@@ -86,4 +93,36 @@ export interface FilterState {
   dateRange: string; // 'all' | '7days' | '30days' | '90days'
   searchQuery: string;
   anonymousOnly?: boolean;
+}
+
+/**
+ * The payload a citizen submits. The server resolves department/service names,
+ * runs sentiment analysis, and assigns the reference number and timestamps.
+ */
+export interface NewFeedbackInput {
+  location: {
+    state: string;
+    district: string;
+    localArea: string;
+    coordinates?: [number, number];
+  };
+  departmentId: string;
+  serviceId: string;
+  overallRating: number;
+  categoryRatings: CategoryRatings;
+  structuredAnswers: StructuredAnswers;
+  summaryComment: string;
+  detailedDescription: string;
+  isAnonymous: boolean;
+  citizenName?: string;
+  citizenContact?: string;
+  attachments: FeedbackAttachment[];
+}
+
+/** A location as offered to the citizen selection step. */
+export interface LocationInfo {
+  state: string;
+  district: string;
+  localArea: string;
+  coordinates?: [number, number];
 }

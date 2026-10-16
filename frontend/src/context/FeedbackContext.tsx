@@ -1,322 +1,328 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  ReactNode,
+} from 'react';
 import {
-  FeedbackRecord,
   Department,
+  FeedbackRecord,
   FilterState,
   GovernmentService,
+  LocationInfo,
+  NewFeedbackInput,
 } from '@/types/feedback';
-import { MOCK_FEEDBACK_DATA } from '@/data/mockFeedback';
-import { INITIAL_DEPARTMENTS } from '@/data/keralaData';
-import { analyzeSentiment } from '@/lib/sentimentAnalyzer';
+import { ApiClient, DepartmentDraft, ServiceDraft } from '@/api/client';
+import { getApiClient } from '@/api';
+import { ApiError, toApiError } from '@/api/errors';
+import { PublicSummary } from '@/domain/analytics';
+import { DEFAULT_FILTERS, filterFeedback } from '@/domain/filters';
 
-interface FeedbackContextType {
-  feedbacks: FeedbackRecord[];
-  departments: Department[];
-  filters: FilterState;
-  filteredFeedbacks: FeedbackRecord[];
-  isAdminLoggedIn: boolean;
-  addFeedback: (record: Omit<FeedbackRecord, 'id' | 'referenceId' | 'createdAt' | 'sentiment' | 'sentimentScore' | 'keywords'>) => FeedbackRecord;
-  deleteFeedback: (id: string) => void;
-  resetToDefaultData: () => void;
-  setFilter: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void;
-  resetFilters: () => void;
-  addDepartment: (dept: Omit<Department, 'id'>) => void;
-  updateDepartment: (dept: Department) => void;
-  deleteDepartment: (id: string) => void;
-  addServiceToDepartment: (deptId: string, service: Omit<GovernmentService, 'id'>) => void;
-  deleteServiceFromDepartment: (deptId: string, serviceId: string) => void;
-  loginAdmin: (password: string) => boolean;
-  logoutAdmin: () => void;
+/** Load the full dataset into memory for client-side analytics and filtering. */
+const LOAD_ALL_PAGE_SIZE = 1000;
+
+interface AdminUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
 }
 
-const DEFAULT_FILTERS: FilterState = {
-  district: 'all',
-  departmentId: 'all',
-  serviceId: 'all',
-  sentiment: 'all',
-  rating: 'all',
-  dateRange: 'all',
-  searchQuery: '',
-};
+interface FeedbackContextType {
+  client: ApiClient;
+  feedbacks: FeedbackRecord[];
+  departments: Department[];
+  locations: LocationInfo[];
+  /** Public, aggregate-only statistics — available without a login. */
+  publicSummary: PublicSummary | null;
+  filters: FilterState;
+  filteredFeedbacks: FeedbackRecord[];
+  isLoading: boolean;
+  error: string | null;
+  isAdminLoggedIn: boolean;
+  adminUser: AdminUser | null;
+  refresh: () => Promise<void>;
+  addFeedback: (input: NewFeedbackInput, idempotencyKey: string) => Promise<FeedbackRecord>;
+  deleteFeedback: (id: string) => Promise<void>;
+  resetToDefaultData: () => Promise<void>;
+  setFilter: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void;
+  resetFilters: () => void;
+  addDepartment: (draft: DepartmentDraft) => Promise<void>;
+  updateDepartment: (dept: Department) => Promise<void>;
+  deleteDepartment: (id: string) => Promise<void>;
+  addServiceToDepartment: (deptId: string, service: ServiceDraft) => Promise<void>;
+  deleteServiceFromDepartment: (deptId: string, serviceId: string) => Promise<void>;
+  loginAdmin: (email: string, password: string) => Promise<boolean>;
+  logoutAdmin: () => Promise<void>;
+}
 
 const FeedbackContext = createContext<FeedbackContextType | undefined>(undefined);
 
-const STORAGE_KEY_FEEDBACKS = 'civicconnect_feedbacks_v1';
-const STORAGE_KEY_DEPARTMENTS = 'civicconnect_departments_v1';
-const STORAGE_KEY_AUTH = 'civicconnect_admin_auth_v1';
-
 export function FeedbackProvider({ children }: { children: ReactNode }) {
-  const [feedbacks, setFeedbacks] = useState<FeedbackRecord[]>(MOCK_FEEDBACK_DATA);
-  const [departments, setDepartments] = useState<Department[]>(INITIAL_DEPARTMENTS);
+  const client = useMemo(() => getApiClient(), []);
+
+  const [feedbacks, setFeedbacks] = useState<FeedbackRecord[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [locations, setLocations] = useState<LocationInfo[]>([]);
+  const [publicSummary, setPublicSummary] = useState<PublicSummary | null>(null);
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
-  const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load from localStorage on mount
-  useEffect(() => {
+  /**
+   * Public data, safe for anyone: the active catalogue, all locations, and the
+   * aggregate-only public summary. Needs no token and no private feedback.
+   */
+  const loadPublicData = useCallback(async () => {
+    const [departmentList, locationList, summary] = await Promise.all([
+      client.listDepartments(),
+      client.listLocations(),
+      client.getPublicSummary(DEFAULT_FILTERS),
+    ]);
+    setDepartments(departmentList);
+    setLocations(locationList);
+    setPublicSummary(summary);
+  }, [client]);
+
+  /**
+   * Admin-only data: the full feedback list and departments including inactive
+   * ones. `GET /feedback/` is authorized on the server, so an anonymous browser is
+   * never sent private submissions.
+   */
+  const loadAdminData = useCallback(async () => {
+    const [departmentList, feedbackPage] = await Promise.all([
+      client.listDepartments({ includeInactive: true }),
+      client.listFeedback(DEFAULT_FILTERS, { pageSize: LOAD_ALL_PAGE_SIZE }),
+    ]);
+    setDepartments(departmentList);
+    setFeedbacks(feedbackPage.results);
+  }, [client]);
+
+  const refresh = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
     try {
-      if (typeof window !== 'undefined') {
-        const savedFeedbacks = localStorage.getItem(STORAGE_KEY_FEEDBACKS);
-        if (savedFeedbacks) {
-          const parsed = JSON.parse(savedFeedbacks);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setFeedbacks(parsed);
-          }
-        }
-
-        const savedDepartments = localStorage.getItem(STORAGE_KEY_DEPARTMENTS);
-        if (savedDepartments) {
-          const parsedDepts = JSON.parse(savedDepartments);
-          if (Array.isArray(parsedDepts) && parsedDepts.length > 0) {
-            setDepartments(parsedDepts);
-          }
-        }
-
-        const authStatus = localStorage.getItem(STORAGE_KEY_AUTH);
-        if (authStatus === 'true') {
-          setIsAdminLoggedIn(true);
+      if (isAdminLoggedIn) {
+        await loadAdminData();
+      } else {
+        await loadPublicData();
+        // The mock adapter has no server-side authorization, so it keeps serving
+        // the demo dataset to citizen views exactly as before.
+        if (client.mode === 'mock') {
+          const feedbackPage = await client.listFeedback(DEFAULT_FILTERS, {
+            pageSize: LOAD_ALL_PAGE_SIZE,
+          });
+          setFeedbacks(feedbackPage.results);
         }
       }
     } catch (err) {
-      console.error('Error loading civic data from localStorage:', err);
+      setError(toApiError(err).message);
     } finally {
-      setIsInitialized(true);
+      setIsLoading(false);
     }
-  }, []);
+  }, [client, isAdminLoggedIn, loadAdminData, loadPublicData]);
 
-  // Save feedbacks to localStorage
-  const persistFeedbacks = (updated: FeedbackRecord[]) => {
-    setFeedbacks(updated);
-    try {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(STORAGE_KEY_FEEDBACKS, JSON.stringify(updated));
+  // Initial load + admin session restore.
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        await loadPublicData();
+        let restored = false;
+        try {
+          const user = await client.getCurrentAdmin();
+          if (user) {
+            restored = true;
+            if (active) {
+              setIsAdminLoggedIn(true);
+              setAdminUser(user);
+            }
+          }
+        } catch {
+          // Session restore is best-effort.
+        }
+        if (restored) {
+          await loadAdminData();
+        } else if (client.mode === 'mock') {
+          const feedbackPage = await client.listFeedback(DEFAULT_FILTERS, {
+            pageSize: LOAD_ALL_PAGE_SIZE,
+          });
+          if (active) setFeedbacks(feedbackPage.results);
+        }
+      } catch (err) {
+        if (active) setError(toApiError(err).message);
+      } finally {
+        if (active) setIsLoading(false);
       }
-    } catch (e) {
-      console.warn('Failed saving feedbacks to localStorage:', e);
-    }
-  };
-
-  // Save departments to localStorage
-  const persistDepartments = (updated: Department[]) => {
-    setDepartments(updated);
-    try {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(STORAGE_KEY_DEPARTMENTS, JSON.stringify(updated));
-      }
-    } catch (e) {
-      console.warn('Failed saving departments to localStorage:', e);
-    }
-  };
-
-  // Add new feedback
-  const addFeedback = (record: Omit<FeedbackRecord, 'id' | 'referenceId' | 'createdAt' | 'sentiment' | 'sentimentScore' | 'keywords'>): FeedbackRecord => {
-    const id = `fb-${Date.now()}`;
-    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const referenceId = `CC-KL-2026-${randomSuffix}`;
-    const createdAt = new Date().toISOString();
-
-    const categoryAvg = (
-      record.categoryRatings.helpfulness +
-      record.categoryRatings.communication +
-      record.categoryRatings.professionalism +
-      record.categoryRatings.responseTime
-    ) / 4;
-
-    const analysis = analyzeSentiment(
-      `${record.summaryComment} ${record.detailedDescription}`,
-      record.overallRating,
-      categoryAvg
-    );
-
-    const fullRecord: FeedbackRecord = {
-      ...record,
-      id,
-      referenceId,
-      createdAt,
-      sentiment: analysis.sentiment,
-      sentimentScore: analysis.score,
-      keywords: analysis.detectedKeywords,
+    })();
+    return () => {
+      active = false;
     };
+  }, [client, loadAdminData, loadPublicData]);
 
-    const updated = [fullRecord, ...feedbacks];
-    persistFeedbacks(updated);
-    return fullRecord;
-  };
+  const addFeedback = useCallback(
+    async (input: NewFeedbackInput, idempotencyKey: string) => {
+      const record = await client.createFeedback(input, idempotencyKey);
+      setFeedbacks((prev) => [record, ...prev]);
+      // Keep the public aggregates fresh for the citizen views (best effort).
+      try {
+        setPublicSummary(await client.getPublicSummary(DEFAULT_FILTERS));
+      } catch {
+        // Non-fatal: the submission itself succeeded.
+      }
+      return record;
+    },
+    [client]
+  );
 
-  const deleteFeedback = (id: string) => {
-    const updated = feedbacks.filter((f) => f.id !== id);
-    persistFeedbacks(updated);
-  };
+  const deleteFeedback = useCallback(
+    async (id: string) => {
+      await client.deleteFeedback(id);
+      setFeedbacks((prev) => prev.filter((f) => f.id !== id));
+    },
+    [client]
+  );
 
-  const resetToDefaultData = () => {
-    persistFeedbacks(MOCK_FEEDBACK_DATA);
-    persistDepartments(INITIAL_DEPARTMENTS);
-    setFilters(DEFAULT_FILTERS);
-  };
+  const resetToDefaultData = useCallback(async () => {
+    await client.resetDemoData();
+    await refresh();
+  }, [client, refresh]);
 
-  const setFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+  const setFilter = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     setFilters((prev) => ({
       ...prev,
       [key]: value,
-      // If department changed, reset serviceId unless it's valid
+      // Choosing a district invalidates a local area from another district.
+      ...(key === 'district' ? { localArea: 'all' } : {}),
+      // Choosing a department invalidates a service from another department.
       ...(key === 'departmentId' ? { serviceId: 'all' } : {}),
     }));
-  };
+  }, []);
 
-  const resetFilters = () => {
-    setFilters(DEFAULT_FILTERS);
-  };
+  const resetFilters = useCallback(() => setFilters(DEFAULT_FILTERS), []);
 
-  // Department management
-  const addDepartment = (dept: Omit<Department, 'id'>) => {
-    const newDept: Department = {
-      ...dept,
-      id: `dept-${Date.now()}`,
-    };
-    persistDepartments([...departments, newDept]);
-  };
+  const reloadDepartments = useCallback(async () => {
+    const list = await client.listDepartments({ includeInactive: true });
+    setDepartments(list);
+  }, [client]);
 
-  const updateDepartment = (updatedDept: Department) => {
-    persistDepartments(departments.map((d) => (d.id === updatedDept.id ? updatedDept : d)));
-  };
-
-  const deleteDepartment = (id: string) => {
-    persistDepartments(departments.filter((d) => d.id !== id));
-  };
-
-  const addServiceToDepartment = (deptId: string, service: Omit<GovernmentService, 'id'>) => {
-    const updated = departments.map((dept) => {
-      if (dept.id !== deptId) return dept;
-      const newService: GovernmentService = {
-        ...service,
-        id: `srv-${Date.now()}`,
-      };
-      return {
-        ...dept,
-        services: [...dept.services, newService],
-      };
-    });
-    persistDepartments(updated);
-  };
-
-  const deleteServiceFromDepartment = (deptId: string, serviceId: string) => {
-    const updated = departments.map((dept) => {
-      if (dept.id !== deptId) return dept;
-      return {
-        ...dept,
-        services: dept.services.filter((s) => s.id !== serviceId),
-      };
-    });
-    persistDepartments(updated);
-  };
-
-  // Admin auth
-  const loginAdmin = (password: string): boolean => {
-    // Demo prototype login
-    if (password === 'DemoAdmin@2026' || password === 'admin' || password === 'demo') {
-      setIsAdminLoggedIn(true);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(STORAGE_KEY_AUTH, 'true');
-      }
-      return true;
-    }
-    return false;
-  };
-
-  const logoutAdmin = () => {
-    setIsAdminLoggedIn(false);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem(STORAGE_KEY_AUTH);
-    }
-  };
-
-  // Memoized filtered feedback records
-  const filteredFeedbacks = useMemo(() => {
-    return feedbacks.filter((item) => {
-      // District filter
-      if (filters.district !== 'all' && item.location.district !== filters.district) {
-        return false;
-      }
-
-      // Department filter
-      if (filters.departmentId !== 'all' && item.departmentId !== filters.departmentId) {
-        return false;
-      }
-
-      // Service filter
-      if (filters.serviceId !== 'all' && item.serviceId !== filters.serviceId) {
-        return false;
-      }
-
-      // Sentiment filter
-      if (filters.sentiment !== 'all' && item.sentiment !== filters.sentiment) {
-        return false;
-      }
-
-      // Rating filter
-      if (filters.rating !== 'all' && item.overallRating !== Number(filters.rating)) {
-        return false;
-      }
-
-      // Search Query filter (matches referenceId, summary, description, citizenName, serviceName)
-      if (filters.searchQuery.trim()) {
-        const query = filters.searchQuery.toLowerCase();
-        const matchesRef = item.referenceId.toLowerCase().includes(query);
-        const matchesSummary = item.summaryComment.toLowerCase().includes(query);
-        const matchesDesc = item.detailedDescription.toLowerCase().includes(query);
-        const matchesService = item.serviceName.toLowerCase().includes(query);
-        const matchesDept = item.departmentName.toLowerCase().includes(query);
-        const matchesDistrict = item.location.district.toLowerCase().includes(query);
-        const matchesArea = item.location.localArea.toLowerCase().includes(query);
-        const matchesCitizen = item.citizenName?.toLowerCase().includes(query) ?? false;
-
-        if (!matchesRef && !matchesSummary && !matchesDesc && !matchesService && !matchesDept && !matchesDistrict && !matchesArea && !matchesCitizen) {
-          return false;
-        }
-      }
-
-      // Date range filter
-      if (filters.dateRange !== 'all') {
-        const itemDate = new Date(item.createdAt).getTime();
-        const now = new Date().getTime();
-        const daysDiff = (now - itemDate) / (1000 * 60 * 60 * 24);
-
-        if (filters.dateRange === '7days' && daysDiff > 7) return false;
-        if (filters.dateRange === '30days' && daysDiff > 30) return false;
-        if (filters.dateRange === '90days' && daysDiff > 90) return false;
-      }
-
-      return true;
-    });
-  }, [feedbacks, filters]);
-
-  return (
-    <FeedbackContext.Provider
-      value={{
-        feedbacks,
-        departments,
-        filters,
-        filteredFeedbacks,
-        isAdminLoggedIn,
-        addFeedback,
-        deleteFeedback,
-        resetToDefaultData,
-        setFilter,
-        resetFilters,
-        addDepartment,
-        updateDepartment,
-        deleteDepartment,
-        addServiceToDepartment,
-        deleteServiceFromDepartment,
-        loginAdmin,
-        logoutAdmin,
-      }}
-    >
-      {children}
-    </FeedbackContext.Provider>
+  const addDepartment = useCallback(
+    async (draft: DepartmentDraft) => {
+      await client.createDepartment(draft);
+      await reloadDepartments();
+    },
+    [client, reloadDepartments]
   );
+
+  const updateDepartment = useCallback(
+    async (dept: Department) => {
+      await client.updateDepartment(dept.id, {
+        name: dept.name,
+        code: dept.code,
+        description: dept.description,
+        iconName: dept.iconName,
+        contactEmail: dept.contactEmail,
+        nodalOfficer: dept.nodalOfficer,
+        isActive: dept.isActive,
+      });
+      await reloadDepartments();
+    },
+    [client, reloadDepartments]
+  );
+
+  const deleteDepartment = useCallback(
+    async (id: string) => {
+      await client.deleteDepartment(id);
+      await reloadDepartments();
+    },
+    [client, reloadDepartments]
+  );
+
+  const addServiceToDepartment = useCallback(
+    async (deptId: string, service: ServiceDraft) => {
+      await client.createService(deptId, service);
+      await reloadDepartments();
+    },
+    [client, reloadDepartments]
+  );
+
+  const deleteServiceFromDepartment = useCallback(
+    async (deptId: string, serviceId: string) => {
+      await client.deleteService(deptId, serviceId);
+      await reloadDepartments();
+    },
+    [client, reloadDepartments]
+  );
+
+  const loginAdmin = useCallback(
+    async (email: string, password: string) => {
+      try {
+        const session = await client.login(email, password);
+        setAdminUser(session.user);
+        setIsAdminLoggedIn(true);
+        // Now authorized: load the full feedback list and inactive departments.
+        await loadAdminData();
+        return true;
+      } catch (err) {
+        if (err instanceof ApiError && err.isUnauthorized) return false;
+        throw err;
+      }
+    },
+    [client, loadAdminData]
+  );
+
+  const logoutAdmin = useCallback(async () => {
+    await client.logout();
+    setIsAdminLoggedIn(false);
+    setAdminUser(null);
+    // Drop the admin-only dataset and fall back to the public, active-only view.
+    setFeedbacks([]);
+    try {
+      await loadPublicData();
+    } catch {
+      // Non-fatal: the citizen views already hold what they need.
+    }
+  }, [client, loadPublicData]);
+
+  const filteredFeedbacks = useMemo(() => filterFeedback(feedbacks, filters), [feedbacks, filters]);
+
+  const value: FeedbackContextType = {
+    client,
+    feedbacks,
+    departments,
+    locations,
+    publicSummary,
+    filters,
+    filteredFeedbacks,
+    isLoading,
+    error,
+    isAdminLoggedIn,
+    adminUser,
+    refresh,
+    addFeedback,
+    deleteFeedback,
+    resetToDefaultData,
+    setFilter,
+    resetFilters,
+    addDepartment,
+    updateDepartment,
+    deleteDepartment,
+    addServiceToDepartment,
+    deleteServiceFromDepartment,
+    loginAdmin,
+    logoutAdmin,
+  };
+
+  return <FeedbackContext.Provider value={value}>{children}</FeedbackContext.Provider>;
 }
 
 export function useFeedback() {
@@ -326,3 +332,10 @@ export function useFeedback() {
   }
   return context;
 }
+
+/** Convenience for components that only need the data client. */
+export function useApiClient(): ApiClient {
+  return useFeedback().client;
+}
+
+export type { GovernmentService };

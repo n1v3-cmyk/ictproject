@@ -12,32 +12,21 @@ import {
   Line,
   CartesianGrid,
   Legend,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
 } from 'recharts';
 import {
-  BarChart3,
   Download,
   Sparkles,
   TrendingUp,
   AlertTriangle,
-  MapPin,
   CheckCircle2,
-  Building2,
-  Calendar,
-  FileSpreadsheet,
 } from 'lucide-react';
 import { useFeedback } from '@/context/FeedbackContext';
 import { FilterBar } from '@/components/admin/FilterBar';
-import { Card, CardContent, CardHeader } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { KERALA_DISTRICTS } from '@/data/keralaData';
+import { Card, CardHeader } from '@/components/ui/Card';
+import { Badge, BadgeVariant } from '@/components/ui/Badge';
 
 export default function ReportsInsightsPage() {
-  const { filteredFeedbacks, feedbacks, departments } = useFeedback();
+  const { filteredFeedbacks, departments } = useFeedback();
 
   // Active analysis tab
   const [activeTab, setActiveTab] = useState<'dimensions' | 'districts' | 'trends' | 'keywords'>('dimensions');
@@ -180,10 +169,10 @@ export default function ReportsInsightsPage() {
       <FilterBar />
 
       {/* Strategic Header & CSV Download */}
-      <div className="bg-white rounded-2xl border border-[#E5E9E6] p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl border border-line p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#46664F] uppercase tracking-wider mb-1">
-            <Sparkles className="w-4 h-4 text-[#46664F]" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-sage-600 uppercase tracking-wider mb-1">
+            <Sparkles className="w-4 h-4 text-sage-600" />
             <span>Administrative Intelligence Briefing</span>
           </div>
           <h2 className="text-xl font-bold text-stone-900">
@@ -198,7 +187,7 @@ export default function ReportsInsightsPage() {
           type="button"
           onClick={handleExportReportCSV}
           disabled={districtPerformanceData.length === 0}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-[#46664F] text-white hover:bg-[#38523F] transition-colors shadow-xs cursor-pointer disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-sage-600 text-white hover:bg-sage-700 transition-colors shadow-xs cursor-pointer disabled:opacity-50"
         >
           <Download className="w-4 h-4" />
           <span>Export Summary Report (CSV)</span>
@@ -207,8 +196,8 @@ export default function ReportsInsightsPage() {
 
       {/* Automated Key Insights Banner */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-[#EBF7EE] border border-[#C6E8CD] space-y-1">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#1E6B35]">
+        <div className="p-4 rounded-xl bg-pos-surface border border-pos-border space-y-1">
+          <div className="flex items-center gap-2 text-xs font-semibold text-pos-ink">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             <span>Top Performing Channel</span>
           </div>
@@ -217,8 +206,8 @@ export default function ReportsInsightsPage() {
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#FEF8EB] border border-[#FDE68A] space-y-1">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#B45309]">
+        <div className="p-4 rounded-xl bg-warn-surface border border-warn-border space-y-1">
+          <div className="flex items-center gap-2 text-xs font-semibold text-warn-ink">
             <TrendingUp className="w-4 h-4 text-amber-600" />
             <span>Turnaround Gap Identified</span>
           </div>
@@ -227,8 +216,8 @@ export default function ReportsInsightsPage() {
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#FDF2F2] border border-[#FECACA] space-y-1">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#B91C1C]">
+        <div className="p-4 rounded-xl bg-neg-surface border border-neg-border space-y-1">
+          <div className="flex items-center gap-2 text-xs font-semibold text-neg-ink">
             <AlertTriangle className="w-4 h-4 text-red-600" />
             <span>Priority Attention Sector</span>
           </div>
@@ -245,7 +234,7 @@ export default function ReportsInsightsPage() {
           onClick={() => setActiveTab('dimensions')}
           className={`pb-3 px-3 transition-colors border-b-2 cursor-pointer ${
             activeTab === 'dimensions'
-              ? 'border-[#46664F] text-[#46664F] font-bold'
+              ? 'border-sage-600 text-sage-600 font-bold'
               : 'border-transparent text-stone-500 hover:text-stone-800'
           }`}
         >
@@ -256,7 +245,7 @@ export default function ReportsInsightsPage() {
           onClick={() => setActiveTab('districts')}
           className={`pb-3 px-3 transition-colors border-b-2 cursor-pointer ${
             activeTab === 'districts'
-              ? 'border-[#46664F] text-[#46664F] font-bold'
+              ? 'border-sage-600 text-sage-600 font-bold'
               : 'border-transparent text-stone-500 hover:text-stone-800'
           }`}
         >
@@ -267,7 +256,7 @@ export default function ReportsInsightsPage() {
           onClick={() => setActiveTab('trends')}
           className={`pb-3 px-3 transition-colors border-b-2 cursor-pointer ${
             activeTab === 'trends'
-              ? 'border-[#46664F] text-[#46664F] font-bold'
+              ? 'border-sage-600 text-sage-600 font-bold'
               : 'border-transparent text-stone-500 hover:text-stone-800'
           }`}
         >
@@ -278,7 +267,7 @@ export default function ReportsInsightsPage() {
           onClick={() => setActiveTab('keywords')}
           className={`pb-3 px-3 transition-colors border-b-2 cursor-pointer ${
             activeTab === 'keywords'
-              ? 'border-[#46664F] text-[#46664F] font-bold'
+              ? 'border-sage-600 text-sage-600 font-bold'
               : 'border-transparent text-stone-500 hover:text-stone-800'
           }`}
         >
@@ -299,9 +288,9 @@ export default function ReportsInsightsPage() {
               </p>
             </div>
             <div className="flex items-center gap-4 text-xs">
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-xs bg-[#46664F]" /> Overall</span>
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-xs bg-[#5B8266]" /> Helpfulness</span>
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-xs bg-[#88A891]" /> Speed</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-xs bg-sage-600" /> Overall</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-xs bg-sage-500" /> Helpfulness</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-xs bg-sage-350" /> Speed</span>
             </div>
           </div>
 
@@ -365,7 +354,7 @@ export default function ReportsInsightsPage() {
           </CardHeader>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#FAF5F5]/40 border-y border-stone-200 text-stone-500 font-semibold uppercase tracking-wider">
+              <thead className="bg-blush-50/40 border-y border-stone-200 text-stone-500 font-semibold uppercase tracking-wider">
                 <tr>
                   <th className="py-3 px-6">District</th>
                   <th className="py-3 px-4">Submissions</th>
@@ -378,7 +367,7 @@ export default function ReportsInsightsPage() {
               <tbody className="divide-y divide-stone-100 text-stone-700">
                 {districtPerformanceData.map((d) => {
                   let healthLabel = 'Exemplary Delivery';
-                  let healthBadge = 'positive';
+                  let healthBadge: BadgeVariant = 'positive';
                   if (d.avgRating < 2.8 || d.negativeRate >= 40) {
                     healthLabel = 'Audit Required';
                     healthBadge = 'negative';
@@ -397,7 +386,7 @@ export default function ReportsInsightsPage() {
                       <td className="py-3.5 px-4 text-emerald-700 font-medium">{d.positiveRate}%</td>
                       <td className="py-3.5 px-4 text-red-600 font-medium">{d.negativeRate}%</td>
                       <td className="py-3.5 px-6 text-right whitespace-nowrap">
-                        <Badge variant={healthBadge as any}>
+                        <Badge variant={healthBadge}>
                           {healthLabel}
                         </Badge>
                       </td>

@@ -1,0 +1,6 @@
+# CivicConnect backend dependencies.
+# PostgreSQL is the default database (psycopg 3 is the driver).
+Django==6.1.2
+djangorestframework==3.18.3
+django-cors-headers==4.9.0
+psycopg[binary]==3.3.6

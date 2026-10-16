@@ -12,22 +12,14 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
   CartesianGrid,
-  Legend,
 } from 'recharts';
 import {
   MessageSquare,
   Star,
   ThumbsUp,
   AlertTriangle,
-  TrendingUp,
   ArrowRight,
-  Sparkles,
-  MapPin,
-  Clock,
-  Layers,
 } from 'lucide-react';
 import { useFeedback } from '@/context/FeedbackContext';
 import { FilterBar } from '@/components/admin/FilterBar';
@@ -143,7 +135,7 @@ export default function AnalyticsDashboardPage() {
         <Card className="p-5">
           <div className="flex items-center justify-between text-stone-500 mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider">Total Feedback</span>
-            <div className="w-8 h-8 rounded-lg bg-[#EBF2ED] text-[#46664F] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-sage-100 text-sage-600 flex items-center justify-center">
               <MessageSquare className="w-4 h-4" />
             </div>
           </div>
@@ -236,7 +228,7 @@ export default function AnalyticsDashboardPage() {
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(val: any) => [`${val} (${Math.round(((Number(val) || 0) / (total || 1)) * 100)}%)`, 'Count']}
+                      formatter={(val) => [`${val} (${Math.round(((Number(val) || 0) / (total || 1)) * 100)}%)`, 'Count']}
                       contentStyle={{ borderRadius: '0.75rem', fontSize: '12px' }}
                     />
                   </PieChart>
@@ -279,7 +271,7 @@ export default function AnalyticsDashboardPage() {
             </div>
             <Link
               href="/admin/reports"
-              className="text-xs text-[#46664F] hover:underline inline-flex items-center gap-1 font-medium"
+              className="text-xs text-sage-600 hover:underline inline-flex items-center gap-1 font-medium"
             >
               <span>Detailed Report</span>
               <ArrowRight className="w-3 h-3" />
@@ -304,7 +296,7 @@ export default function AnalyticsDashboardPage() {
                       tick={{ fontSize: 11, fill: '#6E7571' }}
                     />
                     <Tooltip
-                      formatter={(val: any, name?: any, item?: any) => [
+                      formatter={(val, name, item) => [
                         `${val} / 5.0 (${item?.payload?.count || 0} reviews)`,
                         item?.payload?.name || name,
                       ]}
@@ -333,7 +325,7 @@ export default function AnalyticsDashboardPage() {
             </div>
             <div className="flex items-center gap-3 text-xs text-stone-500">
               <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#46664F]" />
+                <span className="w-2.5 h-2.5 rounded-sm bg-sage-600" />
                 Volume
               </span>
             </div>
@@ -400,7 +392,7 @@ export default function AnalyticsDashboardPage() {
                   topPositiveKeywords.map(([kw, count]) => (
                     <span
                       key={kw}
-                      className="px-2.5 py-1 rounded-lg text-xs bg-[#EBF7EE] text-[#1E6B35] border border-[#C6E8CD] font-medium flex items-center gap-1.5"
+                      className="px-2.5 py-1 rounded-lg text-xs bg-pos-surface text-pos-ink border border-pos-border font-medium flex items-center gap-1.5"
                     >
                       <span>{kw}</span>
                       <span className="w-4 h-4 rounded-full bg-emerald-200/80 text-emerald-900 text-[10px] flex items-center justify-center font-mono">
@@ -424,7 +416,7 @@ export default function AnalyticsDashboardPage() {
           </div>
           <Link
             href="/admin/feedback"
-            className="text-xs font-semibold text-[#46664F] hover:text-[#38523F] inline-flex items-center gap-1"
+            className="text-xs font-semibold text-sage-600 hover:text-sage-700 inline-flex items-center gap-1"
           >
             <span>Open Feedback Explorer</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -432,7 +424,7 @@ export default function AnalyticsDashboardPage() {
         </CardHeader>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#FAF5F5]/40 border-y border-stone-200 text-stone-500 font-semibold uppercase tracking-wider">
+            <thead className="bg-blush-50/40 border-y border-stone-200 text-stone-500 font-semibold uppercase tracking-wider">
               <tr>
                 <th className="py-3 px-6">Reference</th>
                 <th className="py-3 px-4">Location</th>

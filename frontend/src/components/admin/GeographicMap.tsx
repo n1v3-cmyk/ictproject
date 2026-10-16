@@ -101,12 +101,10 @@ export default function GeographicMap({ feedbacks, selectedDistrict }: Geographi
       // Determine hotspot status based on negative count & avg rating
       let pinColor = '#22C55E'; // green
       let badgeLabel = 'High Satisfaction';
-      let pulseClass = '';
 
       if (group.avgRating < 2.8 || group.negativeCount / count >= 0.4) {
         pinColor = '#EF4444'; // red (friction hotspot)
         badgeLabel = 'Frequent Issue Concentration';
-        pulseClass = 'animate-ping opacity-75';
       } else if (group.avgRating < 3.8 || group.negativeCount > 0) {
         pinColor = '#F59E0B'; // amber (moderate/mixed)
         badgeLabel = 'Mixed Experience';
